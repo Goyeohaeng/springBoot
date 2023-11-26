@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.enjoytrip.freeboardBookmark.dao.FreeBoardBookmarkDao">
+	<!-- 조창래 수정 -->
+
+	<!-- 북마크 추가 -->
+	<insert id="addFreeBookmark"
+		parameterType="com.ssafy.enjoytrip.freeboardBookmark.dto.FreeBoardBookmark">
+		INSERT INTO freeboard_bookmark
+		(article_no,
+		user_id)
+		VALUES
+		(#{articleNo}, #{userId})
+	</insert>
+
+	<!-- 북마크 삭제 -->
+	<delete id="deleteFreeBookmark" parameterType="int">
+		DELETE FROM freeboard_bookmark
+		WHERE freeboard_bookmarkId = #{bookmarkId}
+	</delete>
+
+	<!-- 북마크 리스트 -->
+	<select id="getList" parameterType="String"
+		resultType="com.ssafy.enjoytrip.freeboardBookmark.dto.FreeBoardBookmark">
+		SELECT freeboard_bookmarkId,article_no,user_id,create_at
+		FROM freeboard_bookmark
+		where user_id = #{userId}
+	</select>
+
+	<!-- 하나 북마크 되어있는지 가져오기 -->
+	<select id="isBookmarked"  parameterType="map" resultType="com.ssafy.enjoytrip.freeboardBookmark.dto.FreeBoardBookmark">
+		SELECT freeboard_bookmarkId,article_no,user_id,create_at
+		FROM freeboard_bookmark
+		where user_id = #{userId}
+		and article_no= #{articleNo};
+	</select>
+
+</mapper>

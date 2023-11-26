@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.enjoytrip.archive.dao.ArchiveDao">
+
+	<insert id="insertArchive"
+		parameterType="com.ssafy.enjoytrip.archive.dto.ArchiveDto">
+		INSERT INTO archive
+		(user_id,
+		url,
+		title,
+		contents,
+		datetime,
+		thumbnail)
+		VALUES
+		(#{userId}, #{url}, #{title}, #{contents},
+		#{datetime}, #{thumbnail});
+	</insert>
+
+
+	<delete id="deleteArchive" parameterType="int">
+		DELETE FROM
+		archive
+		WHERE archive_id = #{archiveId}
+	</delete>
+
+
+	<select id="getArchiveList" parameterType="String"
+		resultType="com.ssafy.enjoytrip.archive.dto.ArchiveDto">
+		SELECT user_id,
+		archive_id,
+		url,
+		title,
+		contents,
+		datetime,
+		thumbnail
+		FROM archive
+		where user_id = #{userId}
+	</select>
+
+
+
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.ssafy.enjoytrip.AttractionDescription.dao.AttractionDescriptionDao">
+
+
+	<select id="getSido" 
+		resultType="com.ssafy.enjoytrip.Sido.dto.SidoDto">
+		select * from sido;
+	</select>
+
+		
+	<!-- 로그인 하지 않았을 때 관광지 리스트 가져오기 -->
+	<select id="AttractionInfoAllList" parameterType="Map"
+		resultType="com.ssafy.enjoytrip.AttractionInfo.dto.AttractionInfoDto">
+		select * from attraction_info
+		<if test="sidoCode != null">
+			where attraction_info.sido_code = #{sidoCode}
+		</if>
+		<if test="contentTypeId != null">
+			AND attraction_info.content_type_id = #{contentTypeId}
+		</if>
+		<if test="keyword != null">
+			AND attraction_info.title like CONCAT('%', #{keyword},
+			'%')
+		</if>
+		   order by attraction_info.content_id
+	</select>
+	
+	<select id="AttractionInfoList" parameterType="Map"
+		resultType="com.ssafy.enjoytrip.AttractionInfo.dto.AttractionInfoDto">
+		select * from attraction_info
+		left outer join (select * from bookmark where user_id = #{userId}) as bookmark
+		on attraction_info.content_id = bookmark.loc_id
+		<if test="sidoCode != null">
+			where attraction_info.sido_code = #{sidoCode}
+		</if>
+		<if test="contentTypeId != null">
+			AND attraction_info.content_type_id = #{contentTypeId}
+		</if>
+		<if test="keyword != null">
+			AND attraction_info.title like CONCAT('%', #{keyword},
+			'%')
+		</if>
+   			order by attraction_info.content_id
+	</select>
+	
+	
+	<select id="AttractionInfoReviewList" parameterType="Map"
+        resultType="com.ssafy.enjoytrip.AttractionInfo.dto.AttractionInfoDto">
+	    select count(r.content_id) as count_review, ifnull(avg(r.star), 0) as avg_star from review_board r  
+		right outer join attraction_info a on a.content_id =  r.content_id
+		<if test="sidoCode != null">
+            where a.sido_code = #{sidoCode}
+        </if>
+        <if test="contentTypeId != null">
+            AND a.content_type_id = #{contentTypeId}
+        </if>
+        <if test="keyword != null">
+            AND a.title like CONCAT('%', #{keyword},
+            '%')
+        </if>
+		group by a.content_id
+		order by a.content_id;
+        
+        </select>
+
+
+	<!-- 관광지 정보 하나 상세 가져오기 -->
+	<select id="getAttractionDetail" parameterType="Integer"
+		resultType="com.ssafy.enjoytrip.AttractionDescription.dto.AttractionDescriptionDto">
+		select attraction_info.content_id, attraction_info.title , overview, first_image, latitude, longitude  
+		from attraction_info 
+		join attraction_description 
+		on attraction_info.content_id = attraction_description.content_id
+		where attraction_info.content_id = #{contentId};
+	</select>
+	
+	<select id="getIsBookmarked">
+		select bookmark.bookmark_id from bookmark join user on user.user_id = bookmark.user_id 
+		where user.user_id = #{userId} and bookmark.loc_id = #{contentId};
+	</select>
+
+	<select id = "getRecommendLoc" parameterType="map" resultType="com.ssafy.enjoytrip.AttractionDescription.dto.AttractionDescriptionDto">
+
+		<![CDATA[
+		select attraction_info.content_id, attraction_info.title, first_image, latitude, longitude  
+		from attraction_info 
+		where abs(#{latitude} - latitude) <= 0.03 and  abs(#{longitude} - longitude) <= 0.03 
+		order by abs(#{latitude} - latitude)+abs(#{longitude} - longitude)
+		 ]]>
+	</select>
+</mapper>

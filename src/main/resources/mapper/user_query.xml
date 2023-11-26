@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.enjoytrip.user.dao.UserDao">
+	<!-- 조창래 수정 -->
+
+	<!-- 회원 가입 -->
+	<insert id="registerUser" parameterType="com.ssafy.enjoytrip.user.dto.UserDto">
+		insert into user (user_id, name, email, password, SALT) value 
+		(#{userId}, #{name}, #{email}, #{password}, #{SALT})
+	</insert>
+	
+	<!-- profile_image 수정 -->
+	<!-- 회원 정보 수정 -->
+	<update id="modifyUser" parameterType="com.ssafy.enjoytrip.user.dto.UserDto">
+		update user set email = #{email}, name = #{name}, password = #{password}
+		<if test = "SALT != null">
+		,SALT = #{SALT}
+		</if>
+		<if test="profileImage != null">
+		,profile_image = #{profileImage, jdbcType=BLOB}
+		</if>
+		where user_id = #{userId} 
+	</update>
+	
+	<!-- 회원의 모든 북마크 삭제 -->
+	<!-- 유저의 모든 북마크를 삭제 -->
+	<delete id="deleteAllBookmarksByUser" parameterType="string">
+		delete from bookmark where user_id = #{userId}
+	</delete>
+	
+	<!-- 회원 탈퇴 -->
+	<delete id="deleteUser" parameterType="string">
+		delete from user where user_id = #{userId}
+	</delete>
+
+	<!-- 마이페이지 -->
+	<select id="getUser" parameterType="string"
+		resultType="com.ssafy.enjoytrip.user.dto.UserDto">
+		select user_id, name, email, password from user
+		where
+		user_id = #{userId}
+	</select>
+
+	<!-- 로그인 -->
+	<select id="login" parameterType="string"
+		resultType="com.ssafy.enjoytrip.user.dto.UserDto">
+		select user_id, name, email, password, SALT, profile_image from user
+		where
+		user_id = #{userId}
+	</select>
+	
+	<!-- 유저의 SALT 가져오기 -->
+	<select id="getSALT" parameterType="string">
+		select SALT from user
+		where
+		user_id = #{userId}
+	</select>
+	
+
+</mapper>

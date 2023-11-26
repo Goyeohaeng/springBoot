@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.ssafy.enjoytrip.board.dao.ReviewBoardDao">
+	
+	<insert id = "boardInsert" parameterType = "map" >
+	insert into review_board (user_id, content, title, visit_time,  content_id, star, bookmark_id) 
+	values (#{userId}, #{content}, #{title}, #{visitTime} ,#{contentId}, #{star}, #{bookmarkId});
+	</insert>
+	
+	<!-- 조창래 수정 -->
+	<update id = "boardUpdate" parameterType = "com.ssafy.enjoytrip.board.dto.ReviewBoardDto">
+	update review_board set 
+	title = #{title}, 
+	content = #{content},
+	visit_time = #{visitTime}, 
+	star = #{star}
+	where article_no = #{articleNo}
+	</update>
+	
+	<delete id = "boardDelete" parameterType = "int">
+	delete from review_board where article_no = #{articleNo}
+	</delete>
+	
+	<select id = "getBoard" parameterType ="int" resultType = "com.ssafy.enjoytrip.board.dto.ReviewBoardDto">
+	select article_no, content_id, star, user_id, content, visit_time, register_time, title from review_board
+		WHERE article_no = #{articleNo}
+	</select>
+	<select id = "myBoardList" parameterType = "map" resultType = "com.ssafy.enjoytrip.board.dto.ReviewBoardDto">
+		select article_no,  content_id, star, user_id, content, visit_time, register_time, title from review_board
+		WHERE user_id = #{myUserId} LIMIT #{limit} OFFSET #{offset};
+	</select>
+	
+	<select id = "boardList" parameterType = "map" resultType = "com.ssafy.enjoytrip.board.dto.ReviewBoardDto" >
+	select article_no,  content_id, star, user_id, content, visit_time, register_time, title from review_board
+	LIMIT #{limit} OFFSET #{offset};
+	</select>
+
+	
+	<select id="boardSpecific" parameterType = "int" resultType = "com.ssafy.enjoytrip.board.dto.ReviewBoardDto">
+		select article_no, star, content_id, user_id, content , visit_time, register_time, title
+		from review_board 
+		where content_id = #{contentId}
+	</select>
+	
+	<select id="avgStar"  parameterType = "int" >
+		select avg(star)
+		from review_board 
+		group by content_id
+    	having content_id = #{contentId}
+	</select>
+	
+	<!-- 지난 일주일간 작성된 후기 기준으로 10개 이상의 후기가 쓰인 관광지 중에 별점 top3 -->
+	<select id="getTopList" resultType = "com.ssafy.enjoytrip.AttractionInfo.dto.AttractionInfoDto">
+	<![CDATA[ select a.addr1, a.first_image, a.sido_code, a.title, a.content_id, count(r.content_id) as count_review, avg(r.star) as avg_star from review_board r 
+		join attraction_info a on a.content_id =  r.content_id
+		where DATEDIFF( now(), register_time) <= 7 
+		group by a.content_id
+		having count_review > 10 
+		order by avg_star 
+		desc limit 3; 
+		]]>
+	
+	</select>
+	     
+</mapper>

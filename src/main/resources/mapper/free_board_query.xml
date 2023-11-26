@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.ssafy.enjoytrip.board.dao.FreeBoardDao">
+	
+	<insert id = "boardInsert" parameterType = "map" useGeneratedKeys="true" keyProperty="articleNo">
+	insert into free_board (user_id, content, title) values 
+	(#{userId}, #{content}, #{title})
+	<selectKey keyProperty="articleNo" resultType="Integer" order="AFTER">
+		SELECT LAST_INSERT_ID()
+	</selectKey>
+	</insert>
+	
+	<update id = "boardUpdate" parameterType = "com.ssafy.enjoytrip.board.dto.FreeBoardDto">
+	update free_board set 
+	title = #{title}, 
+	content = #{content}
+	where article_no = #{articleNo}
+	</update>
+	
+	<delete id = "boardDelete" parameterType = "int">
+	delete from free_board where article_no = #{articleNo}
+	</delete>
+	
+	<select id = "getBoard" parameterType ="int" resultType = "com.ssafy.enjoytrip.board.dto.FreeBoardDto">
+	select article_no, user.user_id, user.profile_image, content, title, register_time from free_board
+	join user on user.user_id = free_board.user_id
+	WHERE article_no = #{articleNo}
+	</select>
+	
+	<select id = "myBoardListRecent" parameterType = "map" resultType = "com.ssafy.enjoytrip.board.dto.FreeBoardDto">
+	select free_board.article_no, free_board.user_id, free_board.content, free_board.title, free_board.register_time, count(comment_id) as count
+	from free_board 
+	left outer join comment on free_board.article_no = comment.article_no 
+	WHERE free_board.user_id = #{userId}
+	group by free_board.article_no 
+	order by register_time desc
+	LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id = "boardListRecent" parameterType = "map" resultType = "com.ssafy.enjoytrip.board.dto.FreeBoardDto" >
+	select free_board.article_no, free_board.user_id, free_board.content, free_board.title, free_board.register_time, count(comment_id) as count
+	from free_board 
+	left outer join comment on free_board.article_no = comment.article_no 
+	group by free_board.article_no 
+	order by register_time desc
+	LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id = "searchboardListRecent" parameterType = "map" resultType = "com.ssafy.enjoytrip.board.dto.FreeBoardDto">
+	select free_board.article_no, free_board.user_id, free_board.content, free_board.title, free_board.register_time, count(comment_id) as count
+	from free_board 
+	left outer join comment on free_board.article_no = comment.article_no 
+	where free_board.content like CONCAT('%', #{keyword}, '%')
+	group by free_board.article_no 
+	order by register_time desc
+	LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id = "myBoardListCount" parameterType = "map" resultType = "com.ssafy.enjoytrip.board.dto.FreeBoardDto">
+	select free_board.article_no, free_board.user_id, free_board.content, free_board.title, free_board.register_time, count(comment_id) as count
+	from free_board 
+	left outer join comment on free_board.article_no = comment.article_no 
+	WHERE free_board.user_id = #{userId}
+	group by free_board.article_no 
+	order by count desc
+	LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id = "boardListCount" parameterType = "map" resultType = "com.ssafy.enjoytrip.board.dto.FreeBoardDto" >
+	select free_board.article_no, free_board.user_id, free_board.content, free_board.title, free_board.register_time, count(comment_id) as count
+	from free_board 
+	left outer join comment on free_board.article_no = comment.article_no 
+	group by free_board.article_no 
+	order by count desc
+	LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id = "searchboardListCount" parameterType = "map" resultType = "com.ssafy.enjoytrip.board.dto.FreeBoardDto">
+	select free_board.article_no, free_board.user_id, free_board.content, free_board.title, free_board.register_time, count(comment_id) as count
+	from free_board 
+	left outer join comment on free_board.article_no = comment.article_no 
+	where free_board.content like CONCAT('%', #{keyword}, '%')
+	group by free_board.article_no 
+    order by count desc
+   	LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+</mapper>
